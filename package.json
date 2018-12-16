@@ -1,0 +1,31 @@
+{
+  "name": "@arthur/root",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "arthur",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "sb:start": "start-storybook -p 9001 -c .storybook",
+    "sb:build": "build-storybook -c .storybook -o dist",
+    "sb:clean": "rimraf dist",
+    "predeploy": "yarn run sb:clean && yarn run sb:build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "~16.6.3",
+    "react-dom": "~16.6.3"
+  },
+  "devDependencies": {
+    "@babel/core": "~7.2.2",
+    "@babel/plugin-proposal-class-properties": "~7.2.1",
+    "@babel/plugin-proposal-object-rest-spread": "~7.2.0",
+    "@babel/preset-env": "~7.2.0",
+    "@babel/preset-react": "~7.0.0",
+    "@storybook/react": "~4.1.2",
+    "babel-loader": "~8.0.4",
+    "gh-pages": "~2.0.1",
+    "lerna": "~3.6.0",
+    "rimraf": "~2.6.2"
+  }
+}
