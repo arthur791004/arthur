@@ -60,6 +60,10 @@ function resolve(value) {
 }
 
 function fulfill(value) {
+  if (this.state !== STATE.PENDING) {
+    return;
+  }
+
   this.state = STATE.FULFILLED;
   this.result = value;
 
@@ -67,6 +71,10 @@ function fulfill(value) {
 }
 
 function reject(reason) {
+  if (this.state !== STATE.PENDING) {
+    return;
+  }
+
   this.state = STATE.REJECTED;
   this.result = reason;
 
