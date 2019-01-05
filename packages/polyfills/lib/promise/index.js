@@ -41,6 +41,10 @@ export default class Promise {
       }
     });
   }
+
+  catch(onRejection) {
+    return this.then(undefined, onRejection);
+  }
 };
 
 function resolve(value) {
