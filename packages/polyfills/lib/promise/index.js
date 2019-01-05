@@ -64,19 +64,8 @@ export default class Promise {
   }
 };
 
+// TODO: handle resolved value would be thenable
 function resolve(value) {
-  try {
-    const result = isThenable(value)
-      ? value.then()
-      : value;
-
-    fulfill.call(this, result);
-  } catch (reason) {
-    reject.call(this, reason);
-  }
-}
-
-function fulfill(value) {
   if (this.state !== STATE.PENDING) {
     return;
   }
@@ -122,10 +111,6 @@ function getCallback(promise) {
     default:
       return;
   }
-}
-
-function isThenable(value) {
-  return value && typeof value.then === 'function';
 }
 
 function isFunction(fn) {
