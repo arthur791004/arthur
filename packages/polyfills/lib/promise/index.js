@@ -2,7 +2,7 @@
  * Implement promise polyfills according to Promises/A+
  * See: https://www.ecma-international.org/ecma-262/6.0/#sec-promise-constructor
  */
-const STATE = Object.freeze({
+export const STATE = Object.freeze({
   PENDING: 0,
   FULFILLED: 1,
   REJECTED: 2,
