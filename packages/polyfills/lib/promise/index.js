@@ -85,10 +85,13 @@ function done(promise) {
   const { result } = promise;
   const callback = getCallback(promise);
 
-  // TODO: callback should be function and executed asynchronously
-  if (typeof callback === 'function') {
-    callback(result);
+  // callback should be function
+  if (typeof callback !== 'function') {
+    return;
   }
+
+  // callback should be executed asynchronously
+  makeAsyncFn(callback)(result);
 }
 
 function getCallback(promise) {
@@ -106,4 +109,11 @@ function getCallback(promise) {
 
 function isThenable(value) {
   return value && typeof value.then === 'function';
+}
+
+function makeAsyncFn(fn) {
+  // simulate async via setTimeout
+  return (...args) => {
+    setTimeout(() => fn.apply(this, args));
+  };
 }
