@@ -27,18 +27,35 @@ export default class Promise {
   then(onFulfillment, onRejection) {
     // always return new Promise
     return new this.constructor((resolve, reject) => {
-      this.onFulfillment = onFulfillment;
-      this.onRejection = onRejection;
+      this.onFulfillment = (value) => {
+        try {
+          const result = isFunction(onFulfillment)
+            ? onFulfillment(value)
+            : value;
+
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      this.onRejection = (reason) => {
+        try {
+          if (isFunction(onRejection)) {
+            resolve(onRejection(reason));
+          } else {
+            reject(reason);
+          }
+        } catch (error) {
+          reject(error);
+        }
+      };
 
       if (this.state === STATE.PENDING) {
         return;
       }
 
-      try {
-        resolve.call(this, done(this));
-      } catch (reason) {
-        reject.call(this, reason);
-      }
+      resolve.call(this, done(this));
     });
   }
 
@@ -86,12 +103,12 @@ function done(promise) {
   const callback = getCallback(promise);
 
   // callback should be function
-  if (typeof callback !== 'function') {
+  if (!isFunction(callback)) {
     return;
   }
 
   // callback should be executed asynchronously
-  makeAsyncFn(callback)(result);
+  asyncInvokeFn(() => callback(result));
 }
 
 function getCallback(promise) {
@@ -111,9 +128,11 @@ function isThenable(value) {
   return value && typeof value.then === 'function';
 }
 
-function makeAsyncFn(fn) {
+function isFunction(fn) {
+  return typeof fn === 'function';
+}
+
+function asyncInvokeFn(fn) {
   // simulate async via setTimeout
-  return (...args) => {
-    setTimeout(() => fn.apply(this, args));
-  };
+  setTimeout(() => fn());
 }
