@@ -10,7 +10,10 @@
     "sb:build": "build-storybook -c .storybook -o dist",
     "sb:clean": "rimraf dist",
     "predeploy": "yarn run sb:clean && yarn run sb:build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "test": "NODE_ENV=test jest --config jest.config.js",
+    "test:coverage": "yarn run test --coverage",
+    "test:watch": "yarn run test --watch"
   },
   "dependencies": {
     "react": "~16.6.3",
@@ -23,8 +26,11 @@
     "@babel/preset-env": "~7.2.0",
     "@babel/preset-react": "~7.0.0",
     "@storybook/react": "~4.1.2",
+    "babel-core": "~7.0.0-bridge.0",
+    "babel-jest": "~23.6.0",
     "babel-loader": "~8.0.4",
     "gh-pages": "~2.0.1",
+    "jest": "~23.6.0",
     "lerna": "~3.6.0",
     "rimraf": "~2.6.2"
   }
