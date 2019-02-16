@@ -19,8 +19,30 @@ const createNextUnitOfWork = () => {
   }
 };
 
-const beginWork = (fiber) => {
+const updatClassComponent = () => {
 
+};
+
+const updateFunctionComponent = () => {
+
+};
+
+const updateHostComponent = () => {
+
+};
+
+const beginWork = (fiber) => {
+  switch (fiber.tag) {
+    case FIBER_TAGS.ClassComponent:
+      updatClassComponent();
+      break;
+    case FIBER_TAGS.FunctionComponent:
+      updateFunctionComponent();
+      break;
+    case FIBER_TAGS.HostComponent:
+      updateHostComponent();
+      break;
+  }
 };
 
 const completeWork = (fiber) => {
