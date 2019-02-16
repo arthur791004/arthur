@@ -19,8 +19,35 @@ const createNextUnitOfWork = () => {
   }
 };
 
-const performUnitOfWork = (fiber) => {
+const beginWork = (fiber) => {
 
+};
+
+const completeWork = (fiber) => {
+
+};
+
+/**
+ * begin work of fiber and complete if all of the children are completed
+ * @returns {Fiber} the next fiber need to be perform
+ */
+const performUnitOfWork = (fiber) => {
+  beginWork(fiber);
+
+  if (fiber.child) {
+    return fiber.child;
+  }
+
+  let current = fiber;
+  while (current) {
+    completeWork(current);
+
+    if (current.sibling) {
+      return current.sibling;
+    }
+
+    current = current.parent;
+  }
 };
 
 const workLoop = (deadline) => {
