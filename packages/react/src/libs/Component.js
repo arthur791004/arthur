@@ -13,6 +13,10 @@ class Component {
   setState(partialState) {
     scheduleUpdate(this, partialState);
   }
+
+  get isReactComponent() {
+    return {};
+  }
 }
 
 export default Component

@@ -1,4 +1,10 @@
+const REACT_ELEMENT_TYPE = Symbol.for('react.element');
+
 const ReactElement = (type, props) => ({
+  // This tag allows us to uniquely identify this as a React Element
+  $$typeof: REACT_ELEMENT_TYPE,
+  ref: null,
+
   type,
   props,
 })
