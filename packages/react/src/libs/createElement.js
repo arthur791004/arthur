@@ -17,7 +17,7 @@ const ReactElement = (type, props) => ({
  * @return {ReactElement}
  */
 const createElement = (type, config, ...children) => {
-  const props = Object.assign({}, props, { children });
+  const props = Object.assign({}, config, { children });
 
   return ReactElement(type, props);
 };

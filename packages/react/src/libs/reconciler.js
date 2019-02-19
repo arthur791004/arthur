@@ -1,52 +1,62 @@
-import { FIBER_TAGS } from './createFiber';
+import {
+  FIBER_TAGS,
+  EFFECT_TAGS,
+  isRealDOM,
+  createFiber,
+  getFiberFromInstance,
+  setFiberToInstance,
+  getFiberRoot,
+  updateFiber
+} from './fiber';
+import { updateDOMProps } from './dom';
 
 const DEFAUT_WORK_TIME = 1;
 const updateQueue = [];
 let nextUnitOfWork = null;
+let pendingCommit = null;
 
 const scheduleWork = (work) => {
   requestIdleCallback(work);
 }
 
+/**
+ * @returns {FiberNode} root fiber of workingInProgress tree
+ */
 const createNextUnitOfWork = () => {
-  const update = updateQueue.unshift();
+  const update = updateQueue.shift();
   if (!update) {
     return;
   }
 
+  const { fiber, pendingProps, pendingState } = update;
+  const root = getFiberRoot(fiber);
+
+  // set next state to the target fiber
+  fiber.state = pendingState;
+
   return {
     tag: FIBER_TAGS.HostRoot,
+    props: pendingProps || root.props,
+    stateNode: root.stateNode,
+    alternate: root,
   }
-};
-
-const updatClassComponent = () => {
-
-};
-
-const updateFunctionComponent = () => {
-
-};
-
-const updateHostComponent = () => {
-
 };
 
 const beginWork = (fiber) => {
-  switch (fiber.tag) {
-    case FIBER_TAGS.ClassComponent:
-      updatClassComponent();
-      break;
-    case FIBER_TAGS.FunctionComponent:
-      updateFunctionComponent();
-      break;
-    case FIBER_TAGS.HostComponent:
-      updateHostComponent();
-      break;
-  }
+  updateFiber(fiber);
 };
 
 const completeWork = (fiber) => {
+  setFiberToInstance(fiber.stateNode, fiber);
 
+  if (!fiber.return) {
+    pendingCommit = fiber;
+  } else {
+    const childEffects = fiber.effects;
+    const parentEffects = fiber.return.effects || [];
+  
+    fiber.return.effects = parentEffects.concat(childEffects);
+  }
 };
 
 /**
@@ -68,8 +78,38 @@ const performUnitOfWork = (fiber) => {
       return current.sibling;
     }
 
-    current = current.parent;
+    current = current.return;
   }
+};
+
+const commitWork = (fiber) => {
+  if (!isRealDOM(fiber.tag)) {
+    return;
+  }
+
+  let parentFiber = fiber.return;
+  while (!isRealDOM(parentFiber.tag)) {
+    parentFiber = parentFiber.return;
+  }
+
+  const $parent = parentFiber.stateNode;
+  switch (fiber.effectTag) {
+    case EFFECT_TAGS.Placement:
+      $parent.appendChild(fiber.stateNode);
+      break;
+    case EFFECT_TAGS.Update:
+      updateDOMProps(fiber.stateNode, fiber.alternate.props, fiber.props);
+      break;
+    case EFFECT_TAGS.Deletion:
+      break;
+  }
+};
+
+const commitAllWork = (fiber) => {
+  fiber.effects.forEach(effect => commitWork(effect))
+
+  nextUnitOfWork = null;
+  pendingCommit = null;
 };
 
 const workLoop = (deadline) => {
@@ -89,13 +129,33 @@ const workLoop = (deadline) => {
   if (nextUnitOfWork || updateQueue.length > 0) {
     scheduleWork(workLoop);
   }
+
+  if (pendingCommit) {
+    commitAllWork(pendingCommit);
+  }
 }
 
-export const scheduleUpdate = (instance, paritalState) => {
+export const scheduleRender = (element, $container) => {
+  const fiber = getFiberFromInstance($container) ||
+    createFiber(FIBER_TAGS.HostRoot, $container);
   const update = {
-    tag: FIBER_TAGS.ClassComponent,
-    instance,
-    paritalState,
+    fiber,
+    pendingProps: {
+      children: element,
+    }
+  };
+
+  updateQueue.push(update);
+
+  scheduleWork(workLoop);
+}
+
+export const scheduleUpdate = (instance, partialState) => {
+  const fiber = getFiberFromInstance(instance) ||
+    createFiber(FIBER_TAGS.ClassComponent, instance);
+  const update = {
+    fiber,
+    pendingState: partialState || {},
   };
 
   updateQueue.push(update);
