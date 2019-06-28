@@ -1,6 +1,6 @@
-import React from 'react';
+import React from '../../src/react';
 
-class Counter extends React.PureComponent {
+class Counter extends React.Component {
   state = {
     count: 0,
   };
