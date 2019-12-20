@@ -1,0 +1,9 @@
+{
+  "name": "@arthur/ds",
+  "version": "1.0.0",
+  "author": "arthur",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
